@@ -7,9 +7,16 @@ module.exports = PawnBuild =
   subscriptions: null
 
   config:
-    pawnPath:
+    pawnExecutablePath:
+      title: 'Path to pawncc executable'
       type: 'string'
       default: 'C:\\pawn\\pawncc.exe'
+    pawnOptions:
+      title: 'Pawn options'
+      type: 'array'
+      default: ['-d1', '-(', '-;']
+      items:
+        type: 'string'
 
   activate: (state) ->
     # Events subscribed to in atom's system can be easily cleaned up with a CompositeDisposable
@@ -32,8 +39,12 @@ module.exports = PawnBuild =
     return unless filepath? and path.extname(filepath) == '.pwn'
 
     # prepare command
-    cmd = atom.config.get('pawn-build.pawnPath')
-    args = [ '-d1', path.basename filepath ]
+    cmd = atom.config.get('pawn-build.pawnExecutablePath')
+
+    # prepare arguments
+    args = atom.config.get('pawn-build.pawnOptions')
+    args.push path.basename filepath
+
     console.debug filepath, cmd, args
 
     # run pawn
