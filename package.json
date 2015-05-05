@@ -1,0 +1,16 @@
+{
+  "name": "pawn-build",
+  "main": "./lib/pawn-build",
+  "version": "0.0.0",
+  "description": "Build .pwn scripts from within Atom",
+  "activationCommands": {
+    "atom-workspace": "pawn-build:build"
+  },
+  "repository": "https://github.com/frxstrem/atom-pawn-build",
+  "license": "MIT",
+  "engines": {
+    "atom": ">=0.174.0 <2.0.0"
+  },
+  "dependencies": {
+  }
+}
