@@ -1,9 +1,10 @@
 {CompositeDisposable} = require 'atom'
+{MessagePanelView, PlainMessageView, LineMessageView} = require 'atom-message-panel'
 path = require 'path'
 child_process = require 'child_process'
 
 module.exports = PawnBuild =
-  modalPanel: null
+  messages: null
   subscriptions: null
 
   config:
@@ -26,11 +27,19 @@ module.exports = PawnBuild =
     @subscriptions.add atom.commands.add 'atom-workspace', 'pawn-build:build': => @build()
 
   deactivate: ->
-    @modalPanel.destroy()
+    @messages?.detatch()
     @subscriptions.dispose()
     @pawnBuildView.destroy()
 
   serialize: -> undefined
+
+  createOutputPanel: ->
+    unless @messages?
+      @messages = new MessagePanelView
+        title: 'Pawn output'
+    @messages.attach()
+    @messages.clear()
+    return @messages
 
   build: ->
     filepath = atom.workspace.getActiveTextEditor()?.getPath()
@@ -45,11 +54,30 @@ module.exports = PawnBuild =
     args = atom.config.get('pawn-build.pawnOptions')
     args.push path.basename filepath
 
-    console.debug filepath, cmd, args
+    console.debug cmd, args
 
     # run pawn
-    child_process.execFile cmd, args,
+    process = child_process.spawn cmd, args,
       cwd: path.dirname filepath
-    , (error, stdout, stderr) ->
-      console.error error if error?
-      console.error stderr if stderr
+
+    procout = []
+
+    process.stdout.on 'data', (data) ->
+      console.debug data.toString()
+      procout.push data.toString()
+
+    process.stderr.on 'data', (data) ->
+      console.debug data.toString()
+      procout.push data.toString()
+
+    process.on 'error', (error) =>
+      output = @createOutputPanel()
+      output.add new PlainMessageView
+        message: 'Could not run pawncc: ' + error.message
+
+    process.on 'close', (exitCode, signal) =>
+      data = procout.join('')
+      console.log data
+      output = @createOutputPanel()
+      output.add new PlainMessageView
+        message: data
