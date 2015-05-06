@@ -85,6 +85,10 @@ module.exports = PawnBuild =
 
       if data
         # show output of pawncc
+        editor = atom.workspace.getActiveTextEditor()
+        row = data.match(/\(([^)]+)\)/)[1]
+        if row
+          editor.setCursorBufferPosition([row,0])
         lines = data.split('\n')
         for line in lines
           output.add new PlainMessageView
