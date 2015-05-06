@@ -85,6 +85,7 @@ module.exports = PawnBuild =
 
       if data
         # show output of pawncc
+        console.log(data)#temp debug to test
         editor = atom.workspace.getActiveTextEditor()
         row = data.match(/\(([^)]+)\)/)[1]
         if row
