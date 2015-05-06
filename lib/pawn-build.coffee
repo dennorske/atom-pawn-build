@@ -63,11 +63,9 @@ module.exports = PawnBuild =
     procout = []
 
     process.stdout.on 'data', (data) ->
-      console.debug data.toString()
       procout.push data.toString()
 
     process.stderr.on 'data', (data) ->
-      console.debug data.toString()
       procout.push data.toString()
 
     process.on 'error', (error) =>
@@ -77,7 +75,12 @@ module.exports = PawnBuild =
 
     process.on 'close', (exitCode, signal) =>
       data = procout.join('')
-      console.log data
       output = @createOutputPanel()
-      output.add new PlainMessageView
-        message: data
+
+      if data
+        lines = data.split('\n')
+        for line in lines
+          output.add new PlainMessageView
+            message: line
+      else
+          message: 'Could not run pawncc: Unknown error (' + exitCode + ')'
