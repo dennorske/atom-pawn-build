@@ -54,13 +54,12 @@ module.exports = PawnBuild =
     args = atom.config.get('pawn-build.pawnOptions')
     args.push path.basename filepath
 
-    console.debug cmd, args
-
     # run pawn
     process = child_process.spawn cmd, args,
       cwd: path.dirname filepath
 
     procout = []
+    hasError = false
 
     process.stdout.on 'data', (data) ->
       procout.push data.toString()
@@ -69,11 +68,14 @@ module.exports = PawnBuild =
       procout.push data.toString()
 
     process.on 'error', (error) =>
+      hasError = true
       output = @createOutputPanel()
       output.add new PlainMessageView
         message: 'Could not run pawncc: ' + error.message
 
     process.on 'close', (exitCode, signal) =>
+      return if hasError
+
       data = procout.join('')
       output = @createOutputPanel()
 
@@ -83,4 +85,5 @@ module.exports = PawnBuild =
           output.add new PlainMessageView
             message: line
       else
+        output.add new PlainMessageView
           message: 'Could not run pawncc: Unknown error (' + exitCode + ')'
