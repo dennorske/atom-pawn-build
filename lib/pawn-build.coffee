@@ -23,6 +23,12 @@ module.exports = PawnBuild =
       items:
         type: 'string'
 
+    # should jump to error?
+    shouldJumpToError:
+      title: 'Jump to first error?'
+      type: 'boolean'
+      default: false
+
   activate: (state) ->
     # activate package
     @subscriptions = new CompositeDisposable
@@ -91,11 +97,12 @@ module.exports = PawnBuild =
 
       if data
         # jump to the first error line
-        match = data.match(/\(([1-9][0-9]*)\)/)
-        if match?
-          row = parseInt(match[1]) - 1
-          if row < editor.getLineCount()
-            editor.setCursorBufferPosition [row,0]
+        if atom.config.get('build-pawn.shouldJumpToError')
+          match = data.match(/\(([1-9][0-9]*)\)/)
+          if match?
+            row = parseInt(match[1]) - 1
+            if row < editor.getLineCount()
+              editor.setCursorBufferPosition [row,0]
 
         # show output of pawncc
         lines = data.split('\n')
