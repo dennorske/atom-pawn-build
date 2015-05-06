@@ -7,15 +7,15 @@ module.exports = PawnBuild =
   messages: null
   subscriptions: null
 
-  # Configuration options
+  # configuration options
   config:
-    # Path to pawncc executable
+    # path to pawncc executable
     pawnExecutablePath:
       title: 'Path to pawncc executable'
       type: 'string'
       default: 'C:\\pawn\\pawncc.exe'
 
-    # List of pawncc options (passed before filename)
+    # list of pawncc options (passed before filename)
     pawnOptions:
       title: 'Pawn options'
       type: 'array'
@@ -24,12 +24,12 @@ module.exports = PawnBuild =
         type: 'string'
 
   activate: (state) ->
-    # Activate package
+    # activate package
     @subscriptions = new CompositeDisposable
     @subscriptions.add atom.commands.add 'atom-workspace', 'pawn-build:build': => @build()
 
   deactivate: ->
-    # Deactivate package
+    # deactivate package
     @messages?.detatch()
     @subscriptions.dispose()
     @pawnBuildView.destroy()
@@ -37,7 +37,7 @@ module.exports = PawnBuild =
   serialize: -> undefined
 
   createOutputPanel: ->
-    # Create output panel (or return if already exists)
+    # create output panel (or return if already exists)
     unless @messages?
       @messages = new MessagePanelView
         title: 'Pawn output'
@@ -46,14 +46,17 @@ module.exports = PawnBuild =
     return @messages
 
   build: ->
-    # get path of currently open file
-    filepath = atom.workspace.getActiveTextEditor()?.getPath()
+    # get current editor
+    editor = atom.workspace.getActiveTextEditor()
 
+    # get path of currently open file
+    filepath = editor?.getPath()
 
     # only continue if file is a .pwn file
     return unless filepath? and path.extname(filepath) == '.pwn'
-    #also save it, so the unsaved buffer is included
-    atom.workspace.getActiveTextEditor().save()
+
+    # also save the current file, so the current buffer is included
+    editor.save()
 
     # prepare command and arguments from package settigns
     cmd = atom.config.get('pawn-build.pawnExecutablePath')
@@ -87,12 +90,12 @@ module.exports = PawnBuild =
       output = @createOutputPanel()
 
       if data
-        #Jump to the first error line
-        editor = atom.workspace.getActiveTextEditor()
-        invalidLine = editor.getLineCount()
-        row = data.match(/\(([1-9][0-9]*)\)/)[1]
-        if row? and not row
-          editor.setCursorBufferPosition([row-1,0])
+        # jump to the first error line
+        match = data.match(/\(([1-9][0-9]*)\)/)
+        if match?
+          row = parseInt(match[1]) - 1
+          if row < editor.getLineCount()
+            editor.setCursorBufferPosition [row,0]
 
         # show output of pawncc
         lines = data.split('\n')
