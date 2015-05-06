@@ -7,11 +7,15 @@ module.exports = PawnBuild =
   messages: null
   subscriptions: null
 
+  # Configuration options
   config:
+    # Path to pawncc executable
     pawnExecutablePath:
       title: 'Path to pawncc executable'
       type: 'string'
       default: 'C:\\pawn\\pawncc.exe'
+
+    # List of pawncc options (passed before filename)
     pawnOptions:
       title: 'Pawn options'
       type: 'array'
@@ -20,13 +24,12 @@ module.exports = PawnBuild =
         type: 'string'
 
   activate: (state) ->
-    # Events subscribed to in atom's system can be easily cleaned up with a CompositeDisposable
+    # Activate package
     @subscriptions = new CompositeDisposable
-
-    # Register command that toggles this view
     @subscriptions.add atom.commands.add 'atom-workspace', 'pawn-build:build': => @build()
 
   deactivate: ->
+    # Deactivate package
     @messages?.detatch()
     @subscriptions.dispose()
     @pawnBuildView.destroy()
@@ -34,6 +37,7 @@ module.exports = PawnBuild =
   serialize: -> undefined
 
   createOutputPanel: ->
+    # Create output panel (or return if already exists)
     unless @messages?
       @messages = new MessagePanelView
         title: 'Pawn output'
@@ -42,32 +46,32 @@ module.exports = PawnBuild =
     return @messages
 
   build: ->
+    # get path of currently open file
     filepath = atom.workspace.getActiveTextEditor()?.getPath()
 
-    # ignore command if current file is not saved, or is not a .pwn file
+    # only continue if file is a .pwn file
     return unless filepath? and path.extname(filepath) == '.pwn'
 
-    # prepare command
+    # prepare command and arguments from package settigns
     cmd = atom.config.get('pawn-build.pawnExecutablePath')
-
-    # prepare arguments
     args = atom.config.get('pawn-build.pawnOptions')
     args.push path.basename filepath
 
-    # run pawn
+    # run pawncc command
     process = child_process.spawn cmd, args,
-      cwd: path.dirname filepath
+      cwd: path.dirname filepath # run in the current file's directory
 
-    procout = []
-    hasError = false
+    procout = []       # store output from pawncc
+    hasError = false   # store error status
 
+    # read output from pawncc
     process.stdout.on 'data', (data) ->
       procout.push data.toString()
-
     process.stderr.on 'data', (data) ->
       procout.push data.toString()
 
     process.on 'error', (error) =>
+      # show message if pawncc failed to run (for instance due to invalid path)
       hasError = true
       output = @createOutputPanel()
       output.add new PlainMessageView
@@ -80,10 +84,12 @@ module.exports = PawnBuild =
       output = @createOutputPanel()
 
       if data
+        # show output of pawncc
         lines = data.split('\n')
         for line in lines
           output.add new PlainMessageView
             message: line
       else
+        # show error message if pawncc returned no output (unknown error)
         output.add new PlainMessageView
           message: 'Could not run pawncc: Unknown error (' + exitCode + ')'
