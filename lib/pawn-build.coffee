@@ -49,8 +49,11 @@ module.exports = PawnBuild =
     # get path of currently open file
     filepath = atom.workspace.getActiveTextEditor()?.getPath()
 
+
     # only continue if file is a .pwn file
     return unless filepath? and path.extname(filepath) == '.pwn'
+    #also save it, so the unsaved buffer is included
+    atom.workspace.getActiveTextEditor().save()
 
     # prepare command and arguments from package settigns
     cmd = atom.config.get('pawn-build.pawnExecutablePath')
@@ -84,6 +87,13 @@ module.exports = PawnBuild =
       output = @createOutputPanel()
 
       if data
+        #Jump to the first error line
+        editor = atom.workspace.getActiveTextEditor()
+        invalidLine = editor.getLineCount()
+        row = data.match(/\(([1-9][0-9]*)\)/)[1]
+        if row? and not row
+          editor.setCursorBufferPosition([row-1,0])
+
         # show output of pawncc
         lines = data.split('\n')
         for line in lines
