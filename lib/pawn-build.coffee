@@ -87,12 +87,12 @@ module.exports = PawnBuild =
       output = @createOutputPanel()
 
       if data
-
         #Jump to the first error line
         editor = atom.workspace.getActiveTextEditor()
-        row = data.match(/\(([^)]+)\)/)[1]
-        if(isFinite(row))
-          editor.setCursorBufferPosition([row,0])
+        invalidLine = editor.getLineCount()
+        row = data.match(/\(([1-9][0-9]*)\)/)[1]
+        if row? and not row
+          editor.setCursorBufferPosition([row-1,0])
 
         # show output of pawncc
         lines = data.split('\n')
