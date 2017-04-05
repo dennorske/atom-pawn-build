@@ -1,6 +1,6 @@
 {
   "name": "pawn-build",
-  "main": "./lib/pawn-build",
+  "main": "./lib/pawn-build.js",
   "version": "0.2.6",
   "description": "Build .pwn scripts from within Atom",
   "activationCommands": {
@@ -13,5 +13,10 @@
   },
   "dependencies": {
     "atom-message-panel": "^1.2.3"
+  },
+  "devDependencies": {
+    "babel-eslint": "^7.2.1",
+    "eslint": "^3.19.0",
+    "eslint-plugin-babel": "^4.1.1"
   }
 }
