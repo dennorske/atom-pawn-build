@@ -1,3 +1,10 @@
+## 0.2.7
+* Code converted from CoffeScript to JavaScript.
+* Improvements to the MessagePanelView. Header shows current information about compiling, behavior is a bit different from 0.2.6.
+
+## 0.2.4 -- 0.2.6
+* Repository changes, change of Repository owner.
+
 ## 0.2.3
 * Jump to the first error line on error.
 
