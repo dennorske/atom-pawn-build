@@ -1,7 +1,7 @@
 {
   "name": "pawn-build",
   "main": "./lib/pawn-build.js",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "description": "Build .pwn scripts from within Atom",
   "activationCommands": {
     "atom-workspace": "pawn-build:build"
