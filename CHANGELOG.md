@@ -1,3 +1,6 @@
+## 0.2.8
+* Added option to use Wine on Linux/OS X
+
 ## 0.2.7
 * Code converted from CoffeScript to JavaScript.
 * Improvements to the MessagePanelView. Header shows current information about compiling, behavior is a bit different from 0.2.6.
