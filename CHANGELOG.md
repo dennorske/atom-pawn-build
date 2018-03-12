@@ -1,3 +1,6 @@
+## 0.2.10
+* Fixed a stupid mistake with the saving.
+
 ## 0.2.9
 * Made so .inc files can be compiled too, see #4
 * Updated the saving method that was altered in Atom 1.19, see #3
