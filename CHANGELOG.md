@@ -1,3 +1,9 @@
+## 0.2.9
+* Made so .inc files can be compiled too, see #4
+* Updated the saving method that was altered in Atom 1.19, see #3
+* Description for wine-option updated, so it's clear that Wine is required.
+* Updated package description.
+
 ## 0.2.8
 * Added option to use Wine on Linux/OS X
 
